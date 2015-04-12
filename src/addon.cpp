@@ -22,7 +22,7 @@
 
 #include "api/Joystick.h"
 #include "api/JoystickManager.h"
-#include "buttonmapper/ButtonMapper.h"
+#include "devices/Devices.h"
 #include "log/Log.h"
 #include "log/LogAddon.h"
 #include "utils/CommonMacros.h"
@@ -45,12 +45,12 @@ ADDON::CHelper_libKODI_peripheral* PERIPHERAL;
 
 ADDON_STATUS ADDON_Create(void* callbacks, void* props)
 {
+  PERIPHERAL_PROPERTIES* peripheralProps = static_cast<PERIPHERAL_PROPERTIES*>(props);
+
   try
   {
-    if (!callbacks || !props)
+    if (!callbacks || !peripheralProps)
       throw ADDON_STATUS_UNKNOWN;
-
-    PERIPHERAL_PROPERTIES* peripheralProps = static_cast<PERIPHERAL_PROPERTIES*>(props);
 
     FRONTEND = new ADDON::CHelper_libXBMC_addon;
     if (!FRONTEND || !FRONTEND->RegisterMe(callbacks))
@@ -72,7 +72,7 @@ ADDON_STATUS ADDON_Create(void* callbacks, void* props)
   if (!CJoystickManager::Get().Initialize())
     return ADDON_STATUS_PERMANENT_FAILURE;
 
-  if (!CButtonMapper::Get().Initialize())
+  if (!CDevices::Get().Initialize(*peripheralProps))
     return ADDON_STATUS_PERMANENT_FAILURE;
 
   return ADDON_STATUS_OK;
@@ -85,7 +85,7 @@ void ADDON_Stop()
 void ADDON_Destroy()
 {
   CJoystickManager::Get().Deinitialize();
-  CButtonMapper::Get().Deinitialize();
+  CDevices::Get().Deinitialize();
 
   CLog::Get().SetType(SYS_LOG_TYPE_CONSOLE);
 
@@ -210,15 +210,15 @@ void FreeJoystickInfo(JOYSTICK_INFO* info)
 }
 
 PERIPHERAL_ERROR GetButtonMap(const PERIPHERAL_INFO* peripheral, const JOYSTICK_INFO* joystick,
-                              const char* device,
+                              const char* device_id,
                               unsigned int* feature_count, JOYSTICK_FEATURE** features)
 {
-  if (!peripheral || !joystick || !device || !feature_count || !features)
+  if (!peripheral || !joystick || !device_id || !feature_count || !features)
     return PERIPHERAL_ERROR_INVALID_PARAMETERS;
 
   std::vector<ADDON::JoystickFeature*> joystickFeatures;
-  if (CButtonMapper::Get().GetFeatures(ADDON::Peripheral(*peripheral), ADDON::Joystick(*joystick),
-                                       device,  joystickFeatures))
+  if (CDevices::Get().GetFeatures(ADDON::Peripheral(*peripheral), ADDON::Joystick(*joystick),
+                                  device_id,  joystickFeatures))
   {
     *feature_count = joystickFeatures.size();
     ADDON::JoystickFeatures::ToStructs(joystickFeatures, features);
@@ -244,7 +244,7 @@ PERIPHERAL_ERROR MapJoystickFeature(const PERIPHERAL_INFO* peripheral, const JOY
   if (!joystickFeature)
     return PERIPHERAL_ERROR_INVALID_PARAMETERS;
 
-  bool bSuccess = CButtonMapper::Get().MapFeature(ADDON::Peripheral(*peripheral), ADDON::Joystick(*joystick),
+  bool bSuccess = CDevices::Get().MapFeature(ADDON::Peripheral(*peripheral), ADDON::Joystick(*joystick),
                                                   device, joystickFeature);
 
   delete joystickFeature;
