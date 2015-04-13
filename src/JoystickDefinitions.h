@@ -23,7 +23,7 @@
 
 #define BUTTONMAP_XML_ELEM_DEVICES             "devices"
 #define BUTTONMAP_XML_ELEM_DEVICE              "device"
-#define BUTTONMAP_XML_ELEM_PROFILE             "profile"
+#define BUTTONMAP_XML_ELEM_CONTROLLER          "controller"
 #define BUTTONMAP_XML_ELEM_FEATURE             "feature"
 
 #define BUTTONMAP_XML_ATTR_DEVICE_NAME         "name"
@@ -34,7 +34,7 @@
 #define BUTTONMAP_XML_ATTR_DEVICE_HATCOUNT     "hatcount"
 #define BUTTONMAP_XML_ATTR_DEVICE_AXISCOUNT    "axiscount"
 
-#define BUTTONMAP_XML_ATTR_PROFILE_ID          "id"
+#define BUTTONMAP_XML_ATTR_CONTROLLER_ID       "id"
 
 #define BUTTONMAP_XML_ATTR_FEATURE_NAME        "name"
 #define BUTTONMAP_XML_ATTR_FEATURE_BUTTON      "button"

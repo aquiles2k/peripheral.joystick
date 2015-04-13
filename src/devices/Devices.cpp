@@ -141,7 +141,7 @@ bool CDevices::Save(const std::string& strPath) const
 }
 
 bool CDevices::GetFeatures(const ADDON::Peripheral& peripheral, const ADDON::Joystick& joystick,
-                           const std::string& strDeviceId, std::vector<ADDON::JoystickFeature*>& features) const
+                           const std::string& strControllerId, std::vector<ADDON::JoystickFeature*>& features) const
 {
   const std::string& strName     = peripheral.Name();
   uint16_t           vid         = peripheral.VendorID();
@@ -161,13 +161,13 @@ bool CDevices::GetFeatures(const ADDON::Peripheral& peripheral, const ADDON::Joy
 
   std::vector<CDevice>::const_iterator itDevice = std::find(m_devices.begin(), m_devices.end(), needle);
   if (itDevice != m_devices.end())
-    return itDevice->GetFeatures(strDeviceId, features);
+    return itDevice->GetFeatures(strControllerId, features);
 
   return true;
 }
 
 bool CDevices::MapFeature(const ADDON::Peripheral& peripheral, const ADDON::Joystick& joystick,
-                          const std::string& strDeviceId, const ADDON::JoystickFeature* feature)
+                          const std::string& strControllerId, const ADDON::JoystickFeature* feature)
 {
   const std::string& strName     = peripheral.Name();
   uint16_t           vid         = peripheral.VendorID();
@@ -192,7 +192,7 @@ bool CDevices::MapFeature(const ADDON::Peripheral& peripheral, const ADDON::Joys
     itDevice = m_devices.end() - 1;
   }
 
-  if (itDevice->MapFeature(strDeviceId, feature))
+  if (itDevice->MapFeature(strControllerId, feature))
   {
     Save(m_strPath);
     return true;

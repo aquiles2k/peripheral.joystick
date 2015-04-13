@@ -69,18 +69,18 @@ bool CDevice::operator==(const CDevice& rhs) const
 
 }
 
-bool CDevice::GetFeatures(const std::string& strDeviceId, std::vector<ADDON::JoystickFeature*>& features) const
+bool CDevice::GetFeatures(const std::string& strControllerId, std::vector<ADDON::JoystickFeature*>& features) const
 {
-  ButtonMaps::const_iterator it = m_buttonMaps.find(strDeviceId);
+  ButtonMaps::const_iterator it = m_buttonMaps.find(strControllerId);
   if (it != m_buttonMaps.end())
     return it->second.GetFeatures(features);
 
   return true;
 }
 
-bool CDevice::MapFeature(const std::string& strDeviceId, const ADDON::JoystickFeature* feature)
+bool CDevice::MapFeature(const std::string& strControllerId, const ADDON::JoystickFeature* feature)
 {
-  return m_buttonMaps[strDeviceId].MapFeature(feature);
+  return m_buttonMaps[strControllerId].MapFeature(feature);
 }
 
 bool CDevice::IsValid(void) const
@@ -110,10 +110,10 @@ bool CDevice::Serialize(TiXmlElement* pElement) const
 
   for (ButtonMaps::const_iterator it = m_buttonMaps.begin(); it != m_buttonMaps.end(); ++it)
   {
-    const std::string& deviceId = it->first;
+    const std::string& controllerId = it->first;
     const CButtons& buttons = it->second;
 
-    TiXmlElement profileElement(BUTTONMAP_XML_ELEM_PROFILE);
+    TiXmlElement profileElement(BUTTONMAP_XML_ELEM_CONTROLLER);
     TiXmlNode* profileNode = pElement->InsertEndChild(profileElement);
     if (profileNode == NULL)
       continue;
@@ -122,7 +122,7 @@ bool CDevice::Serialize(TiXmlElement* pElement) const
     if (profileElem == NULL)
       continue;
 
-    profileElem->SetAttribute(BUTTONMAP_XML_ATTR_PROFILE_ID, deviceId);
+    profileElem->SetAttribute(BUTTONMAP_XML_ATTR_CONTROLLER_ID, controllerId);
 
     buttons.Serialize(profileElem);
   }
@@ -170,21 +170,21 @@ bool CDevice::Deserialize(const TiXmlElement* pElement)
   if (axisCount)
     m_axisCount = std::atoi(axisCount);
 
-  const TiXmlElement* pProfile = pElement->FirstChildElement(BUTTONMAP_XML_ELEM_PROFILE);
+  const TiXmlElement* pProfile = pElement->FirstChildElement(BUTTONMAP_XML_ELEM_CONTROLLER);
 
   if (!pProfile)
   {
-    esyslog("Device \"%s\": can't find <%s> tag", m_strName.c_str(), BUTTONMAP_XML_ELEM_PROFILE);
+    esyslog("Device \"%s\": can't find <%s> tag", m_strName.c_str(), BUTTONMAP_XML_ELEM_CONTROLLER);
     return false;
   }
 
   while (pProfile)
   {
-    const char* id = pProfile->Attribute(BUTTONMAP_XML_ATTR_PROFILE_ID);
+    const char* id = pProfile->Attribute(BUTTONMAP_XML_ATTR_CONTROLLER_ID);
     if (!id)
     {
       esyslog("Device \"%s\": <%s> tag has no attribute \"%s\"", m_strName.c_str(),
-              BUTTONMAP_XML_ELEM_PROFILE, BUTTONMAP_XML_ATTR_PROFILE_ID);
+              BUTTONMAP_XML_ELEM_CONTROLLER, BUTTONMAP_XML_ATTR_CONTROLLER_ID);
       return false;
     }
 
@@ -194,7 +194,7 @@ bool CDevice::Deserialize(const TiXmlElement* pElement)
 
     m_buttonMaps[id] = buttons;
 
-    pProfile = pProfile->NextSiblingElement(BUTTONMAP_XML_ELEM_PROFILE);
+    pProfile = pProfile->NextSiblingElement(BUTTONMAP_XML_ELEM_CONTROLLER);
   }
 
   return true;
