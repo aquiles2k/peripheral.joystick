@@ -19,7 +19,6 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Kodi Joystick Library</summary>
     <description lang="en">This library enables joystick support through various APIs, including DirectX, XInput, SDL and the Linux Joystick API.</description>
-    <disclaimer lang="en">Work in progress</disclaimer>
     <platform>all</platform>
     <noicon>true</noicon>
     <nofanart>true</nofanart>
